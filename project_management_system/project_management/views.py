@@ -50,9 +50,6 @@ def ProjectView(request,id=None):
         except:
             return Response({'msg': 'Project not found'})
 
-
-
-
 class DepartmentView(APIView):
     def get(self, request, id=None, format=None):
         if id is not None:
@@ -106,6 +103,23 @@ class Documentedit(generics.RetrieveUpdateDestroyAPIView):
     lookup_field='id'
 
 
-class Userview(viewsets.ModelViewSet):
-    queryset= User.objects.all()
-    serializer_class= UserSerializer
+class UserView(APIView):
+    def get(self, request, id=None, format=None):
+        if id is not None:
+            try:
+                user = User.objects.get(id=id)
+                serializer = UserSerializer(user)
+                return Response(serializer.data)
+            except User.DoesNotExist:
+                return Response({'msg': 'User not found'})
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+    
+
+class DocumentFilter(generics.ListAPIView):
+    serializer_class= ProjectSerializer
+    def get_queryset(self):
+        user= self.request.user
+        return Project.objects.filter(user=user)
+

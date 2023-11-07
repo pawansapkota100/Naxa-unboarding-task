@@ -20,8 +20,6 @@ def create_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance, address='ktm', username='pawan', phone='9812345678', country='Nepal')
         print("Profile is created")
+      
 
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    instance.profile.save()
-    print("Profile is saved")
+
