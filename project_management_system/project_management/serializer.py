@@ -12,11 +12,22 @@ class DocumentSerializer(serializers.ModelSerializer):
         model = Document
         fields = '__all__'
 
+
 class ProjectSerializer(serializers.ModelSerializer):
-    document = DocumentSerializer(many=True, read_only=True, source='document_set')
+    deadline = serializers.DateTimeField()
+    manpower = serializers.IntegerField()
+
     class Meta:
         model = Project
         fields = '__all__'
+
+class ProjectCountSerializer(serializers.ModelSerializer):
+    count=serializers.IntegerField()
+    month= serializers.IntegerField()
+    class Meta:
+        model= Project
+        fields=['month','count']
+    
 
 class UserSerializer(serializers.ModelSerializer):
     projects = ProjectSerializer(many=True, read_only=True, source='project_set')   

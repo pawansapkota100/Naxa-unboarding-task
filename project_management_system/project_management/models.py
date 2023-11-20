@@ -9,7 +9,7 @@ class Departmentmanager(models.Manager):
     def get_hr(self):
         return self. filter(name="HR")
 
-class Department (models.Model):
+class Department(models.Model):
     name= models.CharField( max_length=50)
     department_object=Departmentmanager()
 
@@ -22,13 +22,21 @@ class Project(models.Model):
     name= models.CharField( max_length=50)
     start_date= models.DateField( auto_now=False, auto_now_add=False)
 
+
     def __str__(self):
         return self.name
+    
+class Projectuser(models.Model):
+    project= models.ForeignKey(Project,on_delete=models.CASCADE)
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class Document(models.Model):
     project= models.ForeignKey(Project, on_delete=models.CASCADE)
+    user= models.ForeignKey(User, on_delete=models.CASCADE,default=False)
     name= models.CharField( max_length=50)
-    path= models.FileField(upload_to="document/")
+    file= models.FileField(upload_to="document/")
+    upload_date= models.DateField(auto_now=False, auto_now_add=False, null= True)           
 
     def __str__(self):
         return self.name
@@ -39,3 +47,5 @@ class Profile(models.Model):
     username= models.CharField( max_length=50, null=True)
     phone= models.CharField(max_length=10, null= True)
     country= models.CharField( max_length=50, null=True)
+
+
