@@ -21,3 +21,11 @@ admin.site.register(Document, DocumentDetails)
 class ProfileDetails(admin.ModelAdmin):
     list_display= ['user','username','address','country','phone']
 admin.site.register(Profile,ProfileDetails )
+
+class CustomUserDetails(admin.ModelAdmin):
+    pass
+admin.site.register(CustomUser,CustomUserDetails)
+
+class ProjectSiteDetails(admin.ModelAdmin):
+    pass
+admin.site.register(ProjectSite, ProjectSiteDetails)

@@ -220,7 +220,7 @@ class Summary(generics.ListAPIView):
         manpower= self.request.query_params.get('manpower')
         # deadline= self.request.query_params.get('deadline')
         if department is not None and manpower is not None:
-            query_set = Project.objects.annotate(deadline=F('start_date') + timedelta(days=30).strftime('%y-%m-%d'), manpower=Count('document__user')).filter(department=department,manpower=manpower)
+            query_set = Project.objects.annotate(deadline=F('start_date') + timedelta(days=30), manpower=Count('document__user')).filter(department=department,manpower=manpower)
             return query_set
         else:
             return Project.objects.none()
@@ -288,3 +288,33 @@ class Summary(generics.ListAPIView):
 # class UserProjectList(generics.ListAPIView):
 #     filter_backends= (filters.DjangoFilterBackend,)
 #     filterset_fields = ('user')
+
+
+
+# from django.core.management.base import BaseCommand
+# from django.contrib.gis.utils import LayerMapping
+# from project_management.models import ProjectSite
+
+
+# from django.views import View
+
+
+# class ExportView(View):
+#     def get(self, request, *args, **kwargs):
+#         # Define the mapping between model fields and shapefile geometry types
+#         mapping = {
+#             'site_coordinates': 'POINT',
+#             'site_area': 'POLYGON',
+#             'way_to_home': 'LINESTRING',
+#         }
+
+#         # Create a LayerMapping instance, specifying the model, output shapefile path, and mapping
+#         lm = LayerMapping(ProjectSite, 'project_management/files/shapefile .shp', mapping)
+
+#         # Save the data to the shapefile, with strict and verbose options
+#         lm.save(verbose=True)
+
+#         # Optionally, you can also call the management command directly
+#         # call_command('export_command')
+
+    

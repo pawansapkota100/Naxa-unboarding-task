@@ -23,5 +23,6 @@ urlpatterns = [
     path('documentfilter/', views.Document.as_view()),
     path('project_count/', views.ProjectCount.as_view()),
     path('project_summary/', views.ProjectSummary.as_view()),
-    path('summary/', views.Summary.as_view())
+    path('summary/', views.Summary.as_view()),
+    # path('export_data/', views.ExportView.as_view()) 
 ]
