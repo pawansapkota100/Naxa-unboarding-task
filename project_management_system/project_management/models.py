@@ -59,3 +59,13 @@ class Profile(models.Model):
 
 
 
+# class ProjectSite(geomodels.Model):
+#     project = geomodels.ForeignKey(
+#         Project, on_delete=models.CASCADE, related_name="sites"
+#     )
+#     site = geomodels.CharField(max_length=100)
+#     coordinate = geomodels.PointField(blank=True, null=True)
+#     area = geomodels.PolygonField(blank=True, null=True)
+#     way = geomodels.LineStringField(blank=True, null=True)
+#     created_at = geomodels.DateTimeField(auto_now_add=True)
+#     updated_at = geomodels.DateTimeField(auto_now=True)

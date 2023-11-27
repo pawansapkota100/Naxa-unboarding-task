@@ -318,3 +318,174 @@ class Summary(generics.ListAPIView):
 #         # call_command('export_command')
 
     
+
+# from django.http import HttpResponse
+# from rest_framework import generics
+# import geopandas as gpd
+# from shapely.geometry import Point, LineString, shape
+# import json
+# import os
+# import shutil
+# import tempfile
+# from .models import ProjectSite
+# from project_management.serializer import ProjectSiteListSerializer
+
+# class ExportProjectSiteDataView(generics.ListAPIView):
+#     """
+#     This class exports all the project sites geospatial data into a shapefile.
+#     """
+
+#     serializer_class = ProjectSiteListSerializer
+#     queryset = site_coordinates.objects.all()
+
+#     def get(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         data_points = []
+
+#         for project_site in queryset:
+#             site_name = project_site.site
+#             feature = {"site": site_name}  # Initialize feature dictionary
+
+#             # Check and add site_coordinates
+#             if project_site.site_coordinates:
+#                 feature["geometry"] = Point(project_site.site_coordinates)
+
+#             # Check and add site_area
+#             elif project_site.site_area:
+#                 feature["geometry"] = shape(json.loads(project_site.site_area.geojson))
+
+#             # Check and add way_to_home
+#             elif project_site.way_to_home:
+#                 feature["geometry"] = LineString(project_site.way_to_home)
+
+#             # Only add features with valid geometries
+#             if "geometry" in feature:
+#                 if feature["geometry"].is_empty:
+#                     continue
+#                 data_points.append(feature)
+
+#         temp_dir = tempfile.mkdtemp()
+#         shapefile_base = "project-site-geodata"
+#         shapefile_path_base = os.path.join(temp_dir, shapefile_base)
+
+#         try:
+#             os.makedirs(shapefile_path_base, exist_ok=True)
+#         except OSError as e:
+#             print(f"Error in creating dirs in temp dirs: {e}")
+
+#         # Create GeoDataFrame from the list of features
+#         gdf_points = gpd.GeoDataFrame(data_points, geometry="geometry", crs="EPSG:4326")
+
+#         # Export GeoDataFrame to a Shapefile
+#         gdf_points.to_file(os.path.join(shapefile_path_base, f"{shapefile_base}.shp"), driver="ESRI Shapefile")
+
+#         # Create a ZIP file containing the Shapefile
+#         shutil.make_archive(shapefile_path_base, "zip", temp_dir, shapefile_base)
+
+#         # Prepare the response with the ZIP file
+#         with open(f"{shapefile_path_base}.zip", "rb") as zip_file:
+#             response = HttpResponse(zip_file.read(), content_type="application/zip")
+#             response["Content-Disposition"] = f"attachment; filename={shapefile_base}.zip"
+
+#         # Clean up temporary directory
+#         shutil.rmtree(temp_dir)
+
+#         return response
+
+
+from django.http import HttpResponse
+from rest_framework import generics
+import geopandas as gpd
+from shapely.geometry import Point, LineString, shape
+import json
+import os
+import shutil
+import tempfile
+from .models import ProjectSite
+from project_management.serializer import ProjectSiteListSerializer
+class ExportData(generics.ListAPIView):
+    """
+    This class export all the project sites geospatial data into shapefile.
+    """
+
+    serializer_class = ProjectSiteListSerializer
+    queryset = ProjectSite.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data_points = []
+        data_areas = []
+        data_ways = []
+        for project_site in queryset:
+            if project_site.site_coordinates:
+                point_geometry = Point(project_site.site_coordinates)
+                points = {"geometry": point_geometry}
+                data_points.append(points)
+
+            if project_site.site_area:
+                area_geometry = shape(json.loads(project_site.site_area.geojson))
+                areas = { "geometry": area_geometry}
+                data_areas.append(areas)
+
+            if project_site.way_to_home:
+                way_geometry = LineString(project_site.way_to_home)
+                ways = { "geometry": way_geometry}
+                data_ways.append(ways)
+        temp_dir = tempfile.mkdtemp()
+        shapefile_base = "project-site-geodata"
+        shapefile_path_base = os.path.join(temp_dir, shapefile_base)
+        shapefile_name_points = "project-site-points"
+        shapefile_name_areas = "project-site-areas"
+        shapefile_name_ways = "project-site-ways"
+        shapefile_path_points = os.path.join(shapefile_path_base, shapefile_name_points)
+        shapefile_path_areas = os.path.join(shapefile_path_base, shapefile_name_areas)
+        shapefile_path_ways = os.path.join(shapefile_path_base, shapefile_name_ways)
+        try:
+            os.makedirs(shapefile_path_points, exist_ok=True)
+            os.makedirs(shapefile_path_areas, exist_ok=True)
+            os.makedirs(shapefile_path_ways, exist_ok=True)
+        except OSError as e:
+            print(f"Error in creating dirs in temp dirs: {e}")
+        gdf_points = gpd.GeoDataFrame(data_points, geometry="geometry")
+        gdf_points.to_file(shapefile_path_points, driver="ESRI Shapefile")
+
+        gdf_areas = gpd.GeoDataFrame(data_areas, geometry="geometry")
+        gdf_areas.to_file(shapefile_path_areas, driver="ESRI Shapefile")
+
+        gdf_ways = gpd.GeoDataFrame(data_ways, geometry="geometry")
+        gdf_ways.to_file(shapefile_path_ways, driver="ESRI Shapefile")
+
+        shutil.make_archive(shapefile_path_base, "zip", temp_dir, shapefile_base)
+
+        with open(f"{shapefile_path_base}.zip", "rb") as zip_file:
+            response = HttpResponse(zip_file.read(), content_type="application/zip")
+            response[
+                "Content-Disposition"
+            ] = f"attachment; filename={shapefile_base}.zip"
+
+        shutil.rmtree(temp_dir)
+        return response
+
+
+
+
+
+
+
+
+# import geopandas as gpd
+
+# class ExportData(generics.ListAPIView):
+#     serializer_class= ProjectSiteListSerializer
+#     queryset= ProjectSite.objects.all()
+#     def export_to_shapefile(self, queryset,filename='exported_data.shp'):
+#         gdf = gpd.GeoDataFrame(queryset)
+#         gdf.to_file(filename, driver='ESRI Shapefile')
+    
+#     point = ProjectSite.objects.values('site_coordinates')
+#     point= gpd.GeoDataFrame(ProjectSite.objects.values('site_coordinates'))
+#     # polygon= ProjectSite.objects.values('site_area')
+#     # path= ProjectSite.objects.values('way_to_home')
+
+
+

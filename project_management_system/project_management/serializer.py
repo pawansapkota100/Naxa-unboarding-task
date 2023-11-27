@@ -34,3 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'projects']
+
+from .models import ProjectSite
+
+class ProjectSiteListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSite
+        fields = ['site', 'site_coordinates', 'site_area', 'way_to_home']
