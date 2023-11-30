@@ -28,11 +28,32 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 class Project(models.Model):
-    user= models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    department= models.ForeignKey(Department, on_delete=models.CASCADE)
-    name= models.CharField( max_length=50)
-    start_date= models.DateField( auto_now=False, auto_now_add=False)
+    ACTIVE = "Active"
+    CANCELED = "Canceled"
+    COMPLETED = "Completed"
+    ON_HOLD = "On Hold"
+
+    STATUS = [
+        ("Active", _("Active")),
+        ("Canceled", _("Canceled")),
+        ("Completed", _("Completed")),
+        ("On Hold", _("On Hold")),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    start_date = models.DateField(auto_now=False, auto_now_add=False)
+    status = models.CharField(max_length=10, choices=STATUS, default=ACTIVE, null=True)
+    deadline = models.DateTimeField(null=True, blank=True)
+
+
+
     def __str__(self):
         return self.name
 
@@ -59,13 +80,9 @@ class Profile(models.Model):
 
 
 
-# class ProjectSite(geomodels.Model):
-#     project = geomodels.ForeignKey(
-#         Project, on_delete=models.CASCADE, related_name="sites"
-#     )
-#     site = geomodels.CharField(max_length=100)
-#     coordinate = geomodels.PointField(blank=True, null=True)
-#     area = geomodels.PolygonField(blank=True, null=True)
-#     way = geomodels.LineStringField(blank=True, null=True)
-#     created_at = geomodels.DateTimeField(auto_now_add=True)
-#     updated_at = geomodels.DateTimeField(auto_now=True)
+class SystemSummary(models.Model):
+    month= models.IntegerField()
+    year= models.IntegerField()
+    total_project= models.IntegerField(default=0)
+    total_user= models.IntegerField(default=0)
+

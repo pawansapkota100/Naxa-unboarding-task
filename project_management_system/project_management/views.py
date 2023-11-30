@@ -469,6 +469,21 @@ class ExportData(generics.ListAPIView):
 
 
 
+# from osgeo import ogr
+# import os
+
+
+
+# class AlternativeExport(generics.ListAPIView):
+#     queryset= ProjectSite.objects.all()
+#     serializer_class= ProjectSiteListSerializer
+#     gdf=gpd.GeoDataFrame({
+#             'site_coordinate':[site.site_coordinates for site in queryset],
+#             'site_line':[site.way_to_home for site in queryset],
+#             'site_area':[site.site_area for site in queryset]
+
+#         },geometry="geometry")
+#     gdf.to_file('project_sites_export.shp', driver='ESRI Shapefile')
 
 
 
@@ -489,3 +504,22 @@ class ExportData(generics.ListAPIView):
 
 
 
+
+
+
+class ProjectCountListApi(APIView):
+
+    def get(self, request, *args, **kwargs):
+        weekly_project_counts = {}
+        current_year = date.today().year
+        for month in range(1, 13):
+            first_day_of_month = date(current_year, month, 1)
+            for week in range(1, 6):
+                start_date = first_day_of_month + timedelta(days=(week - 1) * 7)
+                end_date = start_date + timedelta(days=6)
+                project_count = Project.objects.filter(
+                    start_date__gte=start_date, start_date__lte=end_date
+                ).count()
+                key = f"{first_day_of_month.strftime('%B')}_week_{week}"
+                weekly_project_counts[key] = project_count
+        return Response(weekly_project_counts)

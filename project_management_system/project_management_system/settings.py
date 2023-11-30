@@ -11,6 +11,17 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 
+from celery.schedules import crontab
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BEAT_SCHEDULE= {
+    'update-system-summary':{
+        'task': 'project_management.tasks.update_summary',
+        'schedule': crontab(minute='*/1') 
+    }
+}
+
 from pathlib import Path
 # import environ
 
@@ -48,6 +59,8 @@ INSTALLED_APPS = [
     'django_filters',
     'django.contrib.gis',
     'project_management',
+    'project_management_system',
+    
 
 
 ]

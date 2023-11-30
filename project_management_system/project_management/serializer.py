@@ -41,3 +41,5 @@ class ProjectSiteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSite
         fields = ['site', 'site_coordinates', 'site_area', 'way_to_home']
+
+

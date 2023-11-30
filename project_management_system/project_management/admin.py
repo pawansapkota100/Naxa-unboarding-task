@@ -3,10 +3,8 @@ from project_management.models import *
 from import_export.admin import ExportActionMixin
 # Register your models here.
 
-
-
 class ProjectDetails(ExportActionMixin,admin.ModelAdmin):
-    list_display=["name","department","start_date"]
+    list_display=["name","department","start_date","status","deadline" ]
     list_filter=["start_date"]
 admin.site.register(Project, ProjectDetails)
 
@@ -29,3 +27,8 @@ admin.site.register(CustomUser,CustomUserDetails)
 class ProjectSiteDetails(admin.ModelAdmin):
     pass
 admin.site.register(ProjectSite, ProjectSiteDetails)
+
+
+class summary(admin.ModelAdmin):
+    list_display=['month','year','total_project','total_user']
+admin.site.register(SystemSummary, summary)

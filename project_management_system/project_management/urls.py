@@ -25,5 +25,7 @@ urlpatterns = [
     path('project_summary/', views.ProjectSummary.as_view()),
     path('summary/', views.Summary.as_view()),
     path('export/', views.ExportData.as_view()),
+    # path('exports/', views.AlternativeExport.as_view()),
+    path('count/', views.ProjectCountListApi.as_view())
 
 ]
